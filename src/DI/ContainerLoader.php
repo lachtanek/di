@@ -73,8 +73,9 @@ class ContainerLoader
 			@mkdir($this->tempDirectory); // @ - directory may already exist
 		}
 
-		$handle = fopen("$file.lock", 'c+');
-		if (!$handle || !flock($handle, LOCK_EX)) {
+		// $handle = fopen("$file.lock", 'c+');
+		// if (!$handle || !flock($handle, LOCK_EX)) {
+		if (!\DirFlock::lock($file, LOCK_EX)) {
 			throw new Nette\IOException("Unable to acquire exclusive lock on '$file.lock'.");
 		}
 
@@ -98,7 +99,8 @@ class ContainerLoader
 		if ((@include $file) === FALSE) { // @ - error escalated to exception
 			throw new Nette\IOException("Unable to include '$file'.");
 		}
-		flock($handle, LOCK_UN);
+		\DirFlock::lock($file, LOCK_UN);
+		// flock($handle, LOCK_UN);
 	}
 
 
